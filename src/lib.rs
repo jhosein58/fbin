@@ -16,15 +16,15 @@ impl FBin {
     }
 
 
-    pub fn seek(&mut self, to: u64) -> Result<(), Error>{
+    pub fn seek(mut self, to: u64) -> Result<Self, Error>{
         self.offset = self.handle.seek(SeekFrom::Start(to))?;
-        Ok(())
+        Ok(self)
     }
 
-    pub fn write(&mut self, bytes: &[u8]) -> Result<(), Error> {
+    pub fn write(mut self, bytes: &[u8]) -> Result<Self, Error> {
         self.handle.write_all(bytes)?;
         self.offset += bytes.len() as u64;
-        Ok(())
+        Ok(self)
     }
 
 }

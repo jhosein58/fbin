@@ -1,8 +1,11 @@
+use std::io::Error;
+
 use fbin::FBin;
 
-fn main() {
-    let mut f = FBin::open("test");
-    f.write(b"hahahaha");
-    f.seek(2).unwrap();
-    f.write(b"hiiii");
+fn main() -> Result<(), Error> {
+
+    let f = FBin::open("test");
+    f.write(b"hello-----")?.seek(6)?.write(b"fbin ")?.write(b"!")?;
+
+    Ok(())
 }
