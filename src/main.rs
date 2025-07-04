@@ -4,7 +4,7 @@ use fbin::FBin;
 
 fn main() -> Result<(), Error> {
 
-    FBin::open_or_create("test")?.write(b"hello-----")?.seek(6)?.write(b"fbin ")?.write(b"!")?;
+    FBin::open_or_create("test")?.seek(10)?.write(b"Hello World")?;
 
     Ok(())
 

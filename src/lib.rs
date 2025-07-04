@@ -9,22 +9,26 @@ pub struct FBin {
 
 impl FBin {
 
-    pub fn open(path: &str) -> Result<Self, Error> { 
-        Ok(Self { handle:  OpenOptions::new().read(true).write(true).open(path)?, offset: 0 })
-    }
-    pub fn open_or_create(path: &str) -> Result<Self, Error> { 
-        Ok(Self { handle:  OpenOptions::new().read(true).write(true).create(true).open(path)?, offset: 0 })
-    }
-    pub fn create(path: &str) -> Result<Self, Error> { 
-        Ok(Self { handle:  OpenOptions::new().read(true).write(true).create_new(true).open(path)?, offset: 0 })
+    fn def_option_generator() -> OpenOptions{
+        OpenOptions::new().read(true).write(true).to_owned()
     }
 
-    pub fn seek(mut self, to: u64) -> Result<Self, Error>{
+    pub fn open(path: &str) -> Result<Self, Error> { 
+        Ok(Self { handle:  Self::def_option_generator().open(path)?, offset: 0 })
+    }
+    pub fn open_or_create(path: &str) -> Result<Self, Error> { 
+        Ok(Self { handle:   Self::def_option_generator().create(true).open(path)?, offset: 0 })
+    }
+    pub fn create(path: &str) -> Result<Self, Error> { 
+        Ok(Self { handle:   Self::def_option_generator().create_new(true).open(path)?, offset: 0 })
+    }
+
+    pub fn seek(&mut self, to: u64) -> Result<&mut Self, Error>{
         self.offset = self.handle.seek(SeekFrom::Start(to))?;
         Ok(self)
     }
 
-    pub fn write(mut self, bytes: &[u8]) -> Result<Self, Error> {
+    pub fn write(&mut self, bytes: &[u8]) -> Result<&mut Self, Error> {
         self.handle.write_all(bytes)?;
         self.offset += bytes.len() as u64;
         Ok(self)
