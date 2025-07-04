@@ -5,16 +5,19 @@ use std::io::{Error, Seek, SeekFrom, Write};
 pub struct FBin {
     handle: File,
     offset: u64,
-
 }
 
 impl FBin {
 
-    pub fn open(path: &str) -> Self {
-        let handle = OpenOptions::new().read(true).write(true).create(true).open(path).unwrap();
-        Self { handle, offset: 0 }
+    pub fn open(path: &str) -> Result<Self, Error> { 
+        Ok(Self { handle:  OpenOptions::new().read(true).write(true).open(path)?, offset: 0 })
     }
-
+    pub fn open_or_create(path: &str) -> Result<Self, Error> { 
+        Ok(Self { handle:  OpenOptions::new().read(true).write(true).create(true).open(path)?, offset: 0 })
+    }
+    pub fn create(path: &str) -> Result<Self, Error> { 
+        Ok(Self { handle:  OpenOptions::new().read(true).write(true).create_new(true).open(path)?, offset: 0 })
+    }
 
     pub fn seek(mut self, to: u64) -> Result<Self, Error>{
         self.offset = self.handle.seek(SeekFrom::Start(to))?;
