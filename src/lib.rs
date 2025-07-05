@@ -1,5 +1,5 @@
 use std::fs::{OpenOptions, File, remove_file};
-use std::io::{Error, Seek, SeekFrom, Write};
+use std::io::{Error, Seek, SeekFrom, Write as wr_loader};
 
 
 pub enum FStrategy {
@@ -40,7 +40,7 @@ pub struct FMode(pub FStrategy, pub FAccess);
 
 impl FMode {
 
-    pub fn combine_flags(strategy: [bool; 4], access: [bool; 4]) -> [bool; 4] {
+    fn combine_flags(strategy: [bool; 4], access: [bool; 4]) -> [bool; 4] {
         [
             strategy[0] || access[0],
             strategy[1] || access[1],
@@ -49,12 +49,17 @@ impl FMode {
         ]
     }
 
-    pub fn flags(&self) -> (bool, bool, bool, bool) {
+    fn flags(&self) -> (bool, bool, bool, bool) {
 
         let flags = Self::combine_flags(self.0.flags(), self.1.flags());
 
         (flags[0], flags[1], flags[2], flags[3])
 
+    }
+
+    pub fn ge_handle(&self, path: &str) -> Result<File, Error> {
+        let (r, w, c, n) = self.flags();
+        OpenOptions::new().read(r).write(w).create(c).create_new(n).open(path)
     }
 }
 
@@ -66,15 +71,9 @@ pub struct FBin {
 
 impl FBin {
 
-    fn get_handle(path: &str, read: bool, write: bool, create: bool, new: bool) -> Result<File, Error>{
-        OpenOptions::new().read(read).write(write).create(create).create_new(new).open(path)
-    }
 
     pub fn open(path: &str, mode: FMode) -> Result<Self, Error> {
-
-        let (read, write, create, new) = mode.flags();
-
-        Self::get_handle(path,  read, write, create, new)
+        mode.ge_handle(path)
         .map(|file| Self {path: path.to_string(), handle: file, offset: 0 })
     }
 
