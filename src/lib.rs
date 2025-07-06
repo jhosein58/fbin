@@ -1,5 +1,5 @@
 use std::fs::{OpenOptions, File, remove_file};
-use std::io::{Error, Seek, SeekFrom, Write as wr_loader};
+use std::io::{Error, Seek, SeekFrom, Write as w_l, Read as r_l};
 
 
 pub enum FStrategy {
@@ -57,7 +57,7 @@ impl FMode {
 
     }
 
-    pub fn ge_handle(&self, path: &str) -> Result<File, Error> {
+    pub fn get_handle(&self, path: &str) -> Result<File, Error> {
         let (r, w, c, n) = self.flags();
         OpenOptions::new().read(r).write(w).create(c).create_new(n).open(path)
     }
@@ -73,7 +73,7 @@ impl FBin {
 
 
     pub fn open(path: &str, mode: FMode) -> Result<Self, Error> {
-        mode.ge_handle(path)
+        mode.get_handle(path)
         .map(|file| Self {path: path.to_string(), handle: file, offset: 0 })
     }
 
@@ -81,8 +81,8 @@ impl FBin {
         Self::open(path, FMode(FStrategy::Open, FAccess::Read)).is_ok()
     }
 
-    pub fn remove(self) -> Result<(), Error>{
-        remove_file(self.path)
+    pub fn drop(&self) -> Result<(), Error>{
+        remove_file(self.path.clone())
     }
 
     pub fn remove_file(path: &str) -> Result<(), Error>{
@@ -97,6 +97,11 @@ impl FBin {
     pub fn write(&mut self, bytes: &[u8]) -> Result<&mut Self, Error> {
         self.handle.write_all(bytes)?;
         self.offset += bytes.len() as u64;
+        Ok(self)
+    }
+    
+    pub fn read(&mut self, buf: &mut [u8]) -> Result<&mut Self, Error>{
+        self.handle.read_exact(buf)?;
         Ok(self)
     }
 
