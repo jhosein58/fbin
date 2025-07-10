@@ -11,3 +11,6 @@ pub use FAccess::*;
 pub use core::FBin;
 
 pub use types::*;
+
+#[cfg(test)]
+mod tests;

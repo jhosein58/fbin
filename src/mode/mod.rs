@@ -13,7 +13,7 @@ pub struct FMode(pub FStrategy, pub FAccess);
 
 impl FMode {
 
-    fn combine_flags(strategy: [bool; 4], access: [bool; 4]) -> [bool; 4] {
+    pub fn combine_flags(strategy: [bool; 4], access: [bool; 4]) -> [bool; 4] {
         [
             strategy[0] || access[0],
             strategy[1] || access[1],
@@ -22,7 +22,7 @@ impl FMode {
         ]
     }
 
-    fn flags(&self) -> (bool, bool, bool, bool) {
+    pub fn flags(&self) -> (bool, bool, bool, bool) {
 
         let flags = Self::combine_flags(self.0.flags(), self.1.flags());
 
