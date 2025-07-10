@@ -1,18 +1,19 @@
 
+use crate::core::FBin;
 pub trait  BinaryType {
     
     type Bytes: AsMut<[u8]> + Default;
     type Value;
 
-    fn to_bytes(&self) -> Self::Bytes;
+    fn to_bytes(&mut self) -> Self::Bytes;
 
     fn from_bytes(bytes: Self::Bytes) -> Self;
 
-    fn get_buf() -> Self::Bytes {
-        Self::Bytes::default()
-    }
+    fn get_buf(ln: usize) -> Self::Bytes;
 
     fn get(&self) -> Self::Value;
+
+    fn len(fh: &mut FBin) -> usize;
 }
 
 pub mod u8;

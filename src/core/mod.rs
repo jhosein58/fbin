@@ -45,7 +45,7 @@ impl FBin {
         Ok(self)
     }
 
-    pub fn write<T>(&mut self, data: T) -> Result<&mut Self, Error>
+    pub fn write<T>(&mut self, mut data: T) -> Result<&mut Self, Error>
     where T: BinaryType
     {
         Ok(self.write_bytes(&data.to_bytes().as_mut())?)
@@ -53,7 +53,7 @@ impl FBin {
     pub fn read<T>(&mut self) -> Result<T, Error>
     where T: BinaryType
     {
-        let mut buf = T::get_buf();
+        let mut buf = T::get_buf(T::len(self));
         self.read_bytes(buf.as_mut())?;
         Ok(T::from_bytes(buf))
     }
