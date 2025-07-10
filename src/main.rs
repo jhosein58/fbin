@@ -4,16 +4,13 @@ use fbin::*;
 
 fn main() -> Result<(), Error> {
 
-    let mut buf = [0u8; 2];
-    
-    FBin::open("test", FMode(OpenOrCreate, ReadWrite))?
-        .seek(0)?
-        .write(&[255, 37, b'h'])?
-        .seek(1)?
-        .read(&mut buf)?
-        .drop()?;
-    
-    println!("{}", buf[1]);
+    let mut f = FBin::open("test", FMode(OpenOrCreate, ReadWrite))?;
+
+    f.seek(0)?.write(StringLe("hello world".to_string()))?.seek(0)?;
+    let res: StringLe = f.read()?;
+    f.drop()?;
+
+    println!("{}", res.get());
     
     Ok(())
 }
